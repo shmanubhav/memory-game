@@ -6,113 +6,95 @@ export default function game_init(root) {
   ReactDOM.render(<Board />, root);
 }
 
-class Tile extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { display: false,
-      value: props.initVal};
-    this.flip = this.flip.bind(this);
-  }
-
-  flip(_ev) {
-    let state1 = _.assign({}, this.state, {display: !this.state.display});
-    this.setState(state1);
-    this.props.afterClick(_ev, this.state.value, this.state.display)
-  }
-  
-  flipAuto(_ev) {
-    let state1 = _.assign({}, this.state, {display: !this.state.display});
-    this.setState(state1);
-  }
-
-  render() {
-    let text = "";
-    if (this.state.display == true) {
-      text = this.state.value;
-    }
-    else {
-      text = "Close"
-    }
-
-    return <div className="column">
-      <p><button onClick={this.flip}>{text}</button></p>
-    </div>
-  }
-}
-
 class Board extends React.Component {
   constructor(props) {
     super(props);
     this.state = {initLetters: _.shuffle(['A','A','B','B','C','C','D','D','E','E','F','F','G','G','H','H']),
-    selectedLetters: []}
-    this.handleInputChange = this.handleInputChange.bind(this);
+    selectedLetters: [],
+    finished: []};
   }
 
-  handleInputChange(event, val, display) {
+  setGuesses(index, letter) {
     if (this.state.selectedLetters.length == 0) {
-      let state1 = _.assign({}, this.state, {selectedLetters: this.state.selectedLetters.push(val)})
-      this.setState(state1);
-    } else if (this.state.selectedLetters.length == 1) {
-      let let1 = this.state.selectedLetters.pop();
-      let let2 = val;
-      if (let1 == let2) {
-        console.log('same');
-      } else {
-        console.log('not same');
-      }
-      let state1 = _.assign({}, this.state, {selectedLetters: []});
+      let state1 = _.assign({},this.state, {selectedLetters: this.state.selectedLetters.concat([{idx: index, letter: letter}])});
       this.setState(state1);
     } else {
-      console.log('Never reaches here');
-      let state2 = _.assign({}, this.state, {selectedLetters: []});
-      this.setState(state2);
-      console.log(this.state2.selectedLetters);
+      let item = this.state.selectedLetters[0];
+      let idx2 = item["idx"];
+      let letter2 = item["letter"];
+      if ((index != idx2)&&(letter == letter2)) {
+        let state1 = _.assign({},this.state, {selectedLetters: [], finished: this.state.finished.concat([letter])});
+        this.setState(state1);
+      } else {
+        let state1 = _.assign({},this.state, {selectedLetters: []});
+        this.setState(state1);
+      }
     }
-    console.log(this.state.selectedLetters);
+  }
+
+  getTileRender(idx) {
+    let letter = this.state.initLetters[idx];
+    let dsp = false;
+    console.log(_.map(this.state.selectedLetters, 'idx'));
+    if (_.includes(_.map(this.state.selectedLetters, 'idx'), idx)) {
+      dsp = true;
+    }
+    if (_.includes(this.state.finished, letter)) {
+      dsp = true;
+    }
+    let ret = <Tile index={idx}
+      display = {dsp}
+      letter = {letter}
+      root = {this}/>;
+    return ret;
   }
 
   render() {
     return <div>
+      
       <div className="row">
-        <Tile initVal={this.state.initLetters[0]}
-          afterClick={this.handleInputChange}/>
-        <Tile initVal={this.state.initLetters[1]}
-          afterClick={this.handleInputChange}/>
-        <Tile initVal={this.state.initLetters[2]}
-          afterClick={this.handleInputChange}/>
-        <Tile initVal={this.state.initLetters[3]}
-          afterClick={this.handleInputChange}/>
+        {this.getTileRender(0)}
+        {this.getTileRender(1)}
+        {this.getTileRender(2)}
+        {this.getTileRender(3)}
       </div>
       <div className="row">
-      <Tile initVal={this.state.initLetters[4]}
-          afterClick={this.handleInputChange}/>
-      <Tile initVal={this.state.initLetters[5]}
-          afterClick={this.handleInputChange}/>
-      <Tile initVal={this.state.initLetters[6]}
-          afterClick={this.handleInputChange}/>
-      <Tile initVal={this.state.initLetters[7]}
-          afterClick={this.handleInputChange}/>
+        {this.getTileRender(4)}
+        {this.getTileRender(5)}
+        {this.getTileRender(6)}
+        {this.getTileRender(7)}
       </div>
       <div className="row">
-      <Tile initVal={this.state.initLetters[8]}
-          afterClick={this.handleInputChange}/>
-      <Tile initVal={this.state.initLetters[9]}
-          afterClick={this.handleInputChange}/>
-      <Tile initVal={this.state.initLetters[10]}
-          afterClick={this.handleInputChange}/>
-      <Tile initVal={this.state.initLetters[11]}
-          afterClick={this.handleInputChange}/>
+        {this.getTileRender(8)}
+        {this.getTileRender(9)}
+        {this.getTileRender(10)}
+        {this.getTileRender(11)}
       </div>
       <div className="row">
-      <Tile initVal={this.state.initLetters[12]}
-          afterClick={this.handleInputChange}/>
-      <Tile initVal={this.state.initLetters[13]}
-          afterClick={this.handleInputChange}/>
-      <Tile initVal={this.state.initLetters[14]}
-          afterClick={this.handleInputChange}/>
-      <Tile initVal={this.state.initLetters[15]}
-          afterClick={this.handleInputChange}/>
+        {this.getTileRender(12)}
+        {this.getTileRender(13)}
+        {this.getTileRender(14)}
+        {this.getTileRender(15)}
       </div>
     </div>;
   }
+}
+
+function Tile(params) {
+  let { root, index, letter, display } = params;
+  let txt = "";
+
+  function setGuess(ev) {
+    root.setGuesses(index, letter);
+    display = !display;
+  }
+
+  if (display == true) {
+    txt = letter;
+  } else {
+    txt = "=="
+  }
+  return <div className="column">
+    <p><button onClick={setGuess}>{ txt }</button></p>
+  </div>
 }
