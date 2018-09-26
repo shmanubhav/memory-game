@@ -11,22 +11,30 @@ class Board extends React.Component {
     super(props);
     this.state = {initLetters: _.shuffle(['A','A','B','B','C','C','D','D','E','E','F','F','G','G','H','H']),
     selectedLetters: [],
-    finished: []};
+    finished: [],
+    clicks: 0};
+  }
+
+  isGameOver() {
+    return (this.state.finished.length >= 8);
   }
 
   setGuesses(index, letter) {
     if (this.state.selectedLetters.length == 0) {
-      let state1 = _.assign({},this.state, {selectedLetters: this.state.selectedLetters.concat([{idx: index, letter: letter}])});
+      let state1 = _.assign({},this.state, {selectedLetters: this.state.selectedLetters.concat([{idx: index, letter: letter}]),
+      clicks: (this.state.clicks+1)});
       this.setState(state1);
     } else {
       let item = this.state.selectedLetters[0];
       let idx2 = item["idx"];
       let letter2 = item["letter"];
       if ((index != idx2)&&(letter == letter2)) {
-        let state1 = _.assign({},this.state, {selectedLetters: [], finished: this.state.finished.concat([letter])});
+        let state1 = _.assign({},this.state, {selectedLetters: [], finished: this.state.finished.concat([letter]),
+        clicks: (this.state.clicks+1)});
         this.setState(state1);
       } else {
-        let state1 = _.assign({},this.state, {selectedLetters: []});
+        let state1 = _.assign({},this.state, {selectedLetters: [],
+        clicks: (this.state.clicks+1)});
         this.setState(state1);
       }
     }
@@ -49,34 +57,51 @@ class Board extends React.Component {
     return ret;
   }
 
-  render() {
-    return <div>
-      
-      <div className="row">
-        {this.getTileRender(0)}
-        {this.getTileRender(1)}
-        {this.getTileRender(2)}
-        {this.getTileRender(3)}
-      </div>
-      <div className="row">
-        {this.getTileRender(4)}
-        {this.getTileRender(5)}
-        {this.getTileRender(6)}
-        {this.getTileRender(7)}
-      </div>
-      <div className="row">
-        {this.getTileRender(8)}
-        {this.getTileRender(9)}
-        {this.getTileRender(10)}
-        {this.getTileRender(11)}
-      </div>
-      <div className="row">
-        {this.getTileRender(12)}
-        {this.getTileRender(13)}
-        {this.getTileRender(14)}
-        {this.getTileRender(15)}
-      </div>
+  getBoardTemplate() {
+    // let ret = <div><p>ploop</p></div>;
+    let ret = <div>
+    <div className="row">
+      <div className="column"><h1>Memory Game</h1></div>
+      <div className="column"><p>Clicks: {this.state.clicks}</p></div>
+    </div>
+    <div className="row">
+      {this.getTileRender(0)}
+      {this.getTileRender(1)}
+      {this.getTileRender(2)}
+      {this.getTileRender(3)}
+    </div>
+    <div className="row">
+      {this.getTileRender(4)}
+      {this.getTileRender(5)}
+      {this.getTileRender(6)}
+      {this.getTileRender(7)}
+    </div>
+    <div className="row">
+      {this.getTileRender(8)}
+      {this.getTileRender(9)}
+      {this.getTileRender(10)}
+      {this.getTileRender(11)}
+    </div>
+    <div className="row">
+      {this.getTileRender(12)}
+      {this.getTileRender(13)}
+      {this.getTileRender(14)}
+      {this.getTileRender(15)}
+    </div>
     </div>;
+    console.log(ret);
+    return ret;
+  }
+
+  getGameOver() {
+    return <h2>Game Over. You win.</h2>
+  }
+
+  render() {
+    if (this.isGameOver()) {
+      return this.getGameOver();
+    }
+    return this.getBoardTemplate();
   }
 }
 
