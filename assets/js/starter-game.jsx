@@ -19,21 +19,34 @@ class Board extends React.Component {
     return (this.state.finished.length >= 8);
   }
 
+  checkSpace() {
+    if (this.state.selectedLetters.length == 2) {
+      let state1 = _.assign({},this.state, {selectedLetters: []});
+      this.setState(state1);
+    }
+  }
+
   setGuesses(index, letter) {
     if (this.state.selectedLetters.length == 0) {
-      let state1 = _.assign({},this.state, {selectedLetters: this.state.selectedLetters.concat([{idx: index, letter: letter}]),
+      let state1 = _.assign({},this.state, {selectedLetters: [{idx: index, letter: letter}],
       clicks: (this.state.clicks+1)});
       this.setState(state1);
     } else {
+      
       let item = this.state.selectedLetters[0];
       let idx2 = item["idx"];
       let letter2 = item["letter"];
-      if ((index != idx2)&&(letter == letter2)) {
-        let state1 = _.assign({},this.state, {selectedLetters: [], finished: this.state.finished.concat([letter]),
+      let state1 = "";
+      if (index == idx2) {
+        state1 = _.assign({},this.state, {selectedLetters: [],
+        clicks: (this.state.clicks+1)});
+        this.setState(state1);
+      } else if ((index != idx2)&&(letter == letter2)) {
+        state1 = _.assign({},this.state, {selectedLetters: [], finished: this.state.finished.concat([letter]),
         clicks: (this.state.clicks+1)});
         this.setState(state1);
       } else {
-        let state1 = _.assign({},this.state, {selectedLetters: [],
+        state1 = _.assign({}, this.state, {selectedLetters: this.state.selectedLetters.concat([{idx: index, letter: letter}]),
         clicks: (this.state.clicks+1)});
         this.setState(state1);
       }
@@ -43,7 +56,6 @@ class Board extends React.Component {
   getTileRender(idx) {
     let letter = this.state.initLetters[idx];
     let dsp = false;
-    console.log(_.map(this.state.selectedLetters, 'idx'));
     if (_.includes(_.map(this.state.selectedLetters, 'idx'), idx)) {
       dsp = true;
     }
@@ -89,12 +101,14 @@ class Board extends React.Component {
       {this.getTileRender(15)}
     </div>
     </div>;
-    console.log(ret);
     return ret;
   }
 
   getGameOver() {
-    return <h2>Game Over. You win.</h2>
+    return <div>
+      <h2>Game Over. You win.</h2>
+      <h3>Clicks: {this.state.clicks}</h3>
+      </div>
   }
 
   render() {
@@ -108,18 +122,21 @@ class Board extends React.Component {
 function Tile(params) {
   let { root, index, letter, display } = params;
   let txt = "";
+  let className = "closed";
 
   function setGuess(ev) {
     root.setGuesses(index, letter);
+    root.checkSpace();
     display = !display;
   }
 
   if (display == true) {
     txt = letter;
+    className = "open"
   } else {
-    txt = "=="
+    txt = "="
   }
   return <div className="column">
-    <p><button onClick={setGuess}>{ txt }</button></p>
-  </div>
+    <p><button className={className} onClick={setGuess}>{ txt }</button></p>
+  </div>;
 }

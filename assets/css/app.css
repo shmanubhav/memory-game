@@ -3,7 +3,41 @@
 @import "~milligram/dist/milligram";
 
 .column > p {
-    padding-top: 10ex;
+    padding-top: 2ex;
     text-align: center;
 }
 
+.closed {
+    background-color: rgb(19, 25, 116);
+    color: rgb(88, 123, 180);
+    height: 80px;
+    font-size: 24px;
+    border-radius: 12px;
+    border: 2px solid blueviolet;
+    text-align: center;
+}
+
+.open {
+    background-color: aqua;
+    color: blueviolet;
+    height: 80px;
+    font-size: 24px;
+    border-radius: 12px;
+    border: 2px solid blue;
+    text-align: center;
+}
+
+.button:focus, .button:hover,
+button:focus,
+button:hover,
+input[type='button']:focus,
+input[type='button']:hover,
+input[type='reset']:focus,
+input[type='reset']:hover,
+input[type='submit']:focus,
+input[type='submit']:hover {
+  background-color: #3be0d3;
+  border-color: #0a28cf;
+  color: rgb(9, 8, 80);
+  outline: 0;
+}
