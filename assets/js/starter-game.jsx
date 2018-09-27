@@ -69,6 +69,13 @@ class Board extends React.Component {
     return ret;
   }
 
+  restart(ev) {
+    this.setState({initLetters: _.shuffle(['A','A','B','B','C','C','D','D','E','E','F','F','G','G','H','H']),
+    selectedLetters: [],
+    finished: [],
+    clicks: 0});
+  }
+
   getBoardTemplate() {
     // let ret = <div><p>ploop</p></div>;
     let ret = <div>
@@ -100,6 +107,9 @@ class Board extends React.Component {
       {this.getTileRender(14)}
       {this.getTileRender(15)}
     </div>
+    <div className="row">
+      <button onClick={this.restart.bind(this)}>RESTART</button>
+    </div>
     </div>;
     return ret;
   }
@@ -108,6 +118,7 @@ class Board extends React.Component {
     return <div>
       <h2>Game Over. You win.</h2>
       <h3>Clicks: {this.state.clicks}</h3>
+      <button onClick={this.restart.bind(this)}>RESTART</button>
       </div>
   }
 
