@@ -2,82 +2,60 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import _ from 'lodash';
 
-export default function game_init(root) {
-  ReactDOM.render(<Board />, root);
+export default function game_init(root, channel) {
+  ReactDOM.render(<Board channel={channel} />, root);
 }
 
 class Board extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {initLetters: _.shuffle(['A','A','B','B','C','C','D','D','E','E','F','F','G','G','H','H']),
-    selectedLetters: [],
-    finished: [],
+    this.channel = props.channel;
+    this.state = {boardMat: [],
+      initLetters: [],
     clicks: 0};
+
+    this.channel.join()
+      .receive("ok", this.getView.bind(this))
+      .receive("error", resp => {console.log("Unable to join ",resp)});
+  }
+
+  getView(view) {
+    console.log("new view", view);
+    this.setState(view.room);
+  }
+
+  sendFlip(index) {
+    this.channel.push("flip", { idx: index })
+      .receive("ok", this.getView.bind(this));
+    this.channel.push("checkBoth", {idx: index})
+      .receive("ok", this.getView.bind(this));
   }
 
   isGameOver() {
-    return (this.state.finished.length >= 8);
-  }
-
-  checkSpace() {
-    if (this.state.selectedLetters.length == 2) {
-      let state1 = _.assign({},this.state, {selectedLetters: []});
-      this.setState(state1);
+    if (this.state.boardMat.length != 0) {
+      return (this.state.boardMat.reduce((acc, val) => acc * val) == 1);
     }
-  }
-
-  setGuesses(index, letter) {
-    if (this.state.selectedLetters.length == 0) {
-      let state1 = _.assign({},this.state, {selectedLetters: [{idx: index, letter: letter}],
-      clicks: (this.state.clicks+1)});
-      this.setState(state1);
-    } else {
-      
-      let item = this.state.selectedLetters[0];
-      let idx2 = item["idx"];
-      let letter2 = item["letter"];
-      let state1 = "";
-      if (index == idx2) {
-        state1 = _.assign({},this.state, {selectedLetters: [],
-        clicks: (this.state.clicks+1)});
-        this.setState(state1);
-      } else if ((index != idx2)&&(letter == letter2)) {
-        state1 = _.assign({},this.state, {selectedLetters: [], finished: this.state.finished.concat([letter]),
-        clicks: (this.state.clicks+1)});
-        this.setState(state1);
-      } else {
-        state1 = _.assign({}, this.state, {selectedLetters: this.state.selectedLetters.concat([{idx: index, letter: letter}]),
-        clicks: (this.state.clicks+1)});
-        this.setState(state1);
-      }
-    }
+    return false;
   }
 
   getTileRender(idx) {
     let letter = this.state.initLetters[idx];
-    let dsp = false;
-    if (_.includes(_.map(this.state.selectedLetters, 'idx'), idx)) {
-      dsp = true;
-    }
-    if (_.includes(this.state.finished, letter)) {
-      dsp = true;
-    }
-    let ret = <Tile index={idx}
-      display = {dsp}
+    let dsp = this.state.boardMat[idx];
+    let ret = <Tile idx={idx}
+      boolVal = {dsp}
       letter = {letter}
       root = {this}/>;
     return ret;
   }
 
   restart(ev) {
-    this.setState({initLetters: _.shuffle(['A','A','B','B','C','C','D','D','E','E','F','F','G','G','H','H']),
-    selectedLetters: [],
-    finished: [],
-    clicks: 0});
+    this.channel.push("restart").receive("ok", this.getView.bind(this));
+    // this.setState({boardMat: [],
+    //   initLetters: [],
+    // clicks: 0});
   }
 
   getBoardTemplate() {
-    // let ret = <div><p>ploop</p></div>;
     let ret = <div>
     <div className="row">
       <div className="column"><h1>Memory Game</h1></div>
@@ -131,14 +109,16 @@ class Board extends React.Component {
 }
 
 function Tile(params) {
-  let { root, index, letter, display } = params;
+  let { root, idx, boolVal, letter } = params;
   let txt = "";
   let className = "closed";
+  let display = false;
+  if (boolVal == "1") {
+    display = true;
+  }
 
   function setGuess(ev) {
-    root.setGuesses(index, letter);
-    root.checkSpace();
-    display = !display;
+    root.sendFlip(idx);
   }
 
   if (display == true) {
