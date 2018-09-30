@@ -30,15 +30,15 @@ defmodule MemoryWeb.RoomChannel do
     name = socket.assigns[:name]
     room = socket.assigns[:room]
     if (length(room[:curLetters]) == 2) do
+      :timer.sleep(1000)
       room = Game.flip(socket.assigns[:room], ll)
       socket = assign(socket, :room, room)
       BackupAgent.put(name, room)
       {:reply, {:ok, %{ "room" => Game.browser_val(room)}}, socket}
     end
-    {:reply, {:ok, %{ "room" => Game.browser_val(room)}}, socket}
   end
 
-  def restart("restart", socket) do
+  def handle_in("restart", %{}, socket) do
     name = socket.assigns[:name]
     room = Game.new()
     socket = socket

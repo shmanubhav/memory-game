@@ -3,7 +3,7 @@ defmodule Memory.Game do
     %{
       initLetters: getInitLetters(),
       curLetters: [],
-      finLetters: ["C"],
+      finLetters: [],
       clicks: 0,
     }
   end
@@ -48,7 +48,6 @@ defmodule Memory.Game do
       end
     else
       if (length(cur) == 2) do
-        :timer.sleep(1000)
         Map.put(game, :curLetters, [])
       else
         val = Enum.at(initLet, idx)

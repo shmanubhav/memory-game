@@ -25,10 +25,10 @@ class Board extends React.Component {
   }
 
   sendFlip(index) {
-    this.channel.push("flip", { idx: index })
-      .receive("ok", this.getView.bind(this));
-    this.channel.push("checkBoth", {idx: index})
-      .receive("ok", this.getView.bind(this));
+    console.log("1",this.channel.push("flip", { idx: index })
+      .receive("ok", this.getView.bind(this)));
+    console.log("2",this.channel.push("checkBoth", {idx: index})
+      .receive("ok", this.getView.bind(this)));
   }
 
   isGameOver() {
@@ -49,7 +49,7 @@ class Board extends React.Component {
   }
 
   restart(ev) {
-    this.channel.push("restart").receive("ok", this.getView.bind(this));
+    this.channel.push("restart",{}).receive("ok", this.getView.bind(this));
     // this.setState({boardMat: [],
     //   initLetters: [],
     // clicks: 0});
@@ -58,8 +58,7 @@ class Board extends React.Component {
   getBoardTemplate() {
     let ret = <div>
     <div className="row">
-      <div className="column"><h1>Memory Game</h1></div>
-      <div className="column"><p>Clicks: {this.state.clicks}</p></div>
+      <div className="column"><h2>Clicks: {this.state.clicks}</h2></div>
     </div>
     <div className="row">
       {this.getTileRender(0)}
