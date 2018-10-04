@@ -6,7 +6,7 @@
 use Mix.Config
 
 # Configures the endpoint
-config :hw04, MemoryWeb.Endpoint,
+config :memory, MemoryWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "3tCdo/km2wQIFrGejdqPGn5R76pJSeSpToj4wj7MofASTRPjxx0ud8/y4i5K8si4",
   render_errors: [view: MemoryWeb.ErrorView, accepts: ~w(html json)],
