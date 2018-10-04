@@ -1,5 +1,5 @@
 defmodule MemoryWeb.Endpoint do
-  use Phoenix.Endpoint, otp_app: :memory
+  use Phoenix.Endpoint, otp_app: :hw04
 
   socket "/socket", MemoryWeb.UserSocket,
     websocket: true,
@@ -37,7 +37,7 @@ defmodule MemoryWeb.Endpoint do
   # Set :encryption_salt if you would also like to encrypt it.
   plug Plug.Session,
     store: :cookie,
-    key: "_memory_key",
+    key: "_hw04_key",
     signing_salt: "YRRT7teV"
 
   plug MemoryWeb.Router
